@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es"></html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almacenamiento en remoto</title>
+    <link rel="stylesheet" href="../css/style.css">
+  </head>
+  <body>
+    <script>
+
+      let albumId = 1 //Contador para el boton de añadir album
+      const table = document.createElement("table");
+      document.body.appendChild(table);
+
+      const tableHead = document.createElement("thead");
+      table.appendChild(tableHead);
+
+      const headerRow = document.createElement("tr");
+      tableHead.appendChild(headerRow);
+
+      const headerId = document.createElement("th");
+      headerId.textContent = "ID de album";
+      headerRow.appendChild(headerId);
+
+      const headerTitle = document.createElement("th");
+      headerTitle.textContent = "Título de album";
+      headerRow.appendChild(headerTitle);
+
+      const headerImage = document.createElement("th");
+      headerImage.textContent = "Imagen principal";
+      headerRow.appendChild(headerImage);
+
+      const headerAction = document.createElement("th");
+      headerAction.textContent = "Acción";
+      headerRow.appendChild(headerAction);
+
+      const tableBody = document.createElement("tbody");
+      table.appendChild(tableBody);
+
+      fetch("https://jsonplaceholder.typicode.com/photos")
+        .then((response) => response.json())
+        .then((data) => {
+          for (let i = 0; i < 20; i++) {
+            const album = data[i];
+            const row = document.createElement("tr");
+            tableBody.appendChild(row);
+
+            const cellId = document.createElement("td");
+            cellId.textContent = album.id;
+            row.appendChild(cellId);
+
+            const cellTitle = document.createElement("td");
+            cellTitle.textContent = album.title;
+            row.appendChild(cellTitle);
+
+            const cellImage = document.createElement("td");
+            const image = document.createElement("img");
+            image.src = album.url;
+            image.alt = album.title;
+            cellImage.appendChild(image);
+            row.appendChild(cellImage);
+
+            const cellAction = document.createElement("td");
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Eliminar";
+            deleteButton.addEventListener("click", () => {
+              fetch(`https://jsonplaceholder.typicode.com/photos/${album.id}`, {
+                method: "DELETE",
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  console.log("Resultado del borrado: ", data);
+                  row.remove();
+                });
+            });
+            cellAction.appendChild(deleteButton);
+            row.appendChild(cellAction);
+          }
+
+          const addAlbumButton = document.createElement("button");
+          addAlbumButton.textContent = "Añadir álbum";
+          addAlbumButton.addEventListener("click", () => {
+            fetch("https://jsonplaceholder.typicode.com/photos", {
+              method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              albumId,
+              thumbnail: null,
+              title: "Nombre del alumno",
+              url:
+                "https://cursos.com/wp-content/uploads/2021/04/academia-tokio-school.jpg",
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Resultado de la inserción: ", data);
+            });
+            albumId++
+          });
+          document.body.appendChild(addAlbumButton);
+        });
+     </script>
+  </body>
+</html>
